@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Layers, Settings, Shield, RefreshCw } from 'lucide-react';
+import { MessageSquare, Layers, Settings, Shield, Trophy } from 'lucide-react';
 import DocumentManager, { Document } from './components/DocumentManager';
 import ChatInterface from './components/ChatInterface';
 import RetrievalPlayground from './components/RetrievalPlayground';
 import AdminDashboard from './components/AdminDashboard';
+import GameArena from './components/GameArena';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'chat' | 'playground' | 'dashboard'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'playground' | 'dashboard' | 'game'>('chat');
   const [provider, setProvider] = useState<string>('local');
   const [documents, setDocuments] = useState<Document[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -45,9 +46,7 @@ export default function Home() {
   const handleSaveSettings = () => {
     setProvider(tempProvider);
     localStorage.setItem('rag_provider', tempProvider);
-    // In a live app, we could save the keys to context or local state.
-    // For local dev, we instruct them to place them in .env.local,
-    // but saving in sessionStorage can make it available to request headers!
+    // In a live app, we could save the keys to sessionStorage/headers.
     sessionStorage.setItem('gemini_key', geminiKey);
     sessionStorage.setItem('openai_key', openaiKey);
     setShowSettings(false);
@@ -90,7 +89,24 @@ export default function Home() {
               className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
               onClick={() => setActiveTab('dashboard')}
             >
-              <Shield size={14} /> Admin telemetry
+              <Shield size={14} /> Admin Telemetry
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'game' ? 'active' : ''}`}
+              onClick={() => setActiveTab('game')}
+              style={{ position: 'relative' }}
+            >
+              <Trophy size={14} style={{ color: activeTab === 'game' ? 'gold' : 'inherit' }} /> Game Arena
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'hsl(var(--accent-purple))',
+                boxShadow: '0 0 8px hsl(var(--accent-purple))'
+              }}></span>
             </button>
           </div>
 
@@ -118,6 +134,10 @@ export default function Home() {
         
         {activeTab === 'dashboard' && (
           <AdminDashboard />
+        )}
+
+        {activeTab === 'game' && (
+          <GameArena documents={documents} />
         )}
       </div>
 
